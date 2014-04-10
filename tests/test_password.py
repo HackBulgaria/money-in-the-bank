@@ -8,13 +8,19 @@ from password import Password
 
 class PasswordTest(unittest.TestCase):
     def setUp(self):
-        self.p = Password("radorado")
+        self.p = Password("Radorado1234@")
 
     """docstring for PasswordTest"""
     def test_to_sha1(self):
-        self.assertEqual('a4b63a5cc956327ffca0a877517a4866aa3f7022',
+        self.assertEqual('4293b365e7ca8d7914fda1524abd754bc1ca6235',
                          self.p.to_sha1())
 
+    def test_to_plain(self):
+        plain = "LQLQLLQLQ"
+        p = Password(plain)
+
+        self.assertEqual(plain, p.get_plain())
+
     def test_to_string(self):
-        self.assertEqual('a4b63a5cc956327ffca0a877517a4866aa3f7022',
+        self.assertEqual('4293b365e7ca8d7914fda1524abd754bc1ca6235',
                          str(self.p))

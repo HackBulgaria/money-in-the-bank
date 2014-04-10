@@ -12,13 +12,13 @@ class SqlManagerTests(unittest.TestCase):
     def setUp(self):
         self.sql_manager = SqlManager("bank_test.db")
         self.sql_manager.create_clients_table()
-        self.sql_manager.register('Tester', Password('123'))
+        self.sql_manager.register('Tester', Password('Radorado1234@'))
 
     def tearDown(self):
         self.sql_manager.cursor.execute('DROP TABLE clients')
 
     def test_register(self):
-        p = Password('123123')
+        p = Password('Radorado1234@')
         self.sql_manager.register('Dinko', p)
         count_sql = """SELECT Count(*)
                        FROM clients
@@ -45,24 +45,24 @@ class SqlManagerTests(unittest.TestCase):
         self.assertNotEqual(plain, db_password)
 
     def test_login(self):
-        p = Password('123')
+        p = Password('Radorado1234@')
         logged_user = self.sql_manager.login('Tester', p)
         self.assertEqual(logged_user.get_username(), 'Tester')
 
     def test_login_with_sql_injection(self):
-        p = Password("whatever")
+        p = Password("Radorado1234@whatever")
         logged_user = self.sql_manager.login("' OR 1 = 1 --", p)
         self.assertIsNone(logged_user)
 
     def test_login_wrong_password(self):
-        p = Password("wrong")
+        p = Password("Radorado1234@wrong")
         logged_user = self.sql_manager.login('Tester', p)
         self.assertFalse(logged_user)
 
     def test_change_password(self):
-        p = Password("123")
+        p = Password("Radorado1234@")
         logged_user = self.sql_manager.login('Tester', p)
-        new_password = Password("12345")
+        new_password = Password("Radorado1234@12345")
         self.sql_manager.change_pass(new_password, logged_user)
 
         new_pass = self.sql_manager.login('Tester', new_password)
