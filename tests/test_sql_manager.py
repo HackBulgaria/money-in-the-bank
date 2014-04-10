@@ -28,7 +28,6 @@ class SqlManagerTests(unittest.TestCase):
         logged_user = self.sql_manager.login('Tester', '123')
         self.assertEqual(logged_user.get_username(), 'Tester')
 
-
     def test_login_with_sql_injection(self):
         logged_user = self.sql_manager.login("' OR 1 = 1 --", "whatever")
         self.assertIsNone(logged_user)
@@ -36,12 +35,6 @@ class SqlManagerTests(unittest.TestCase):
     def test_login_wrong_password(self):
         logged_user = self.sql_manager.login('Tester', '123567')
         self.assertFalse(logged_user)
-
-    def test_change_message(self):
-        logged_user = self.sql_manager.login('Tester', '123')
-        new_message = "podaivinototam"
-        self.sql_manager.change_message(new_message, logged_user)
-        self.assertEqual(logged_user.get_message(), new_message)
 
     def test_change_password(self):
         logged_user = self.sql_manager.login('Tester', '123')

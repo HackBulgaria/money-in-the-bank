@@ -12,19 +12,9 @@ class SqlManager():
             clients(id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT,
                     password TEXT,
-                    balance REAL DEFAULT 0,
-                    message TEXT)'''
+                    balance REAL DEFAULT 0)'''
 
         self.cursor.execute(create_query)
-
-    def change_message(self, new_message, logged_user):
-        update_sql = """UPDATE clients
-                        SET message = '%s'
-                        WHERE id = '%s'"""
-        update_sql = update_sql % (new_message, logged_user.get_id())
-        self.cursor.execute(update_sql)
-        self.conn.commit()
-        logged_user.set_message(new_message)
 
     def change_pass(self, new_pass, logged_user):
         update_sql = """UPDATE clients
@@ -40,7 +30,7 @@ class SqlManager():
         self.conn.commit()
 
     def login(self, username, password):
-        select_query = """SELECT id, username, balance, message
+        select_query = """SELECT id, username, balance
                           FROM clients
                           WHERE username = ? AND password = ?
                           LIMIT 1"""
@@ -49,6 +39,6 @@ class SqlManager():
         user = self.cursor.fetchone()
 
         if(user):
-            return Client(user[0], user[1], user[2], user[3])
+            return Client(user[0], user[1], user[2])
         else:
             return None
