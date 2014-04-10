@@ -32,3 +32,11 @@ class TestPasswordValidator(unittest.TestCase):
         validator = PasswordValidator(passwd, self.user)
 
         self.assertFalse(validator.validate())
+
+    def test_password_validator_validate_name_in_pass(self):
+        user = Client(1, "lqlq", 0)
+        p = Password("lqlqOMG11!!")
+        validator = PasswordValidator(p, user)
+
+        self.assertFalse(validator.validate())
+

@@ -23,7 +23,8 @@ class PasswordValidator():
         validators = [self._more_than_n_symbols,
                       self._one_capital,
                       self._one_number,
-                      self._one_special]
+                      self._one_special,
+                      self._name_in_password]
 
         result = map(lambda f: f(), validators)
         return all(result)
@@ -57,6 +58,12 @@ class PasswordValidator():
                 return True
 
         return False
+
+    def _name_in_password(self):
+        username = self.user.get_username()
+        plain = self.password.get_plain()
+
+        return username not in plain
 
 
 class Password():
