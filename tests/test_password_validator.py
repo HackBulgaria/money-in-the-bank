@@ -3,7 +3,7 @@ import sys
 
 sys.path.append("..")
 
-from password import Password, PasswordValidator
+from password import Password, PasswordValidator, PasswordNotStrongException
 from client import Client
 
 
@@ -40,3 +40,14 @@ class TestPasswordValidator(unittest.TestCase):
 
         self.assertFalse(validator.validate())
 
+    def test_password_that_is_valid(self):
+        user = Client(1, "lqlq", 0)
+        p = Password("radoradoOMG11!!")
+        validator = PasswordValidator(p, user)
+
+        self.assertTrue(validator.validate())
+
+    def test_validate_with_exception(self):
+        validator = PasswordValidator(self.weak_password, self.user)
+        with self.assertRaises(PasswordNotStrongException):
+            validator.validate_with_exception()
