@@ -18,15 +18,15 @@ class SqlManager():
 
     def change_pass(self, new_pass, logged_user):
         update_sql = """UPDATE clients
-                        SET password = '%s'
-                        WHERE id = '%s'"""
-        update_sql = update_sql % (new_pass, logged_user.get_id())
-        self.cursor.execute(update_sql)
+                        SET password = ?
+                        WHERE id = ?"""
+        self.cursor.execute(update_sql, (new_pass, logged_user.get_id()))
         self.conn.commit()
 
     def register(self, username, password):
-        insert_sql = "insert into clients (username, password) values ('%s', '%s')" % (username, password)
-        self.cursor.execute(insert_sql)
+        insert_sql = """INSERT INTO clients (username, password)
+                        VALUES (?, ?)"""
+        self.cursor.execute(insert_sql, (username, password))
         self.conn.commit()
 
     def login(self, username, password):

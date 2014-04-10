@@ -18,8 +18,11 @@ class SqlManagerTests(unittest.TestCase):
 
     def test_register(self):
         self.sql_manager.register('Dinko', '123123')
-
-        self.sql_manager.cursor.execute('SELECT Count(*)  FROM clients WHERE username = (?) AND password = (?)', ('Dinko', '123123'))
+        count_sql = """SELECT Count(*)
+                       FROM clients
+                       WHERE username = ? AND password = ?
+                    """
+        self.sql_manager.cursor.execute(count_sql, ('Dinko', '123123'))
         users_count = self.sql_manager.cursor.fetchone()
 
         self.assertEqual(users_count[0], 1)
@@ -41,8 +44,8 @@ class SqlManagerTests(unittest.TestCase):
         new_password = "12345"
         self.sql_manager.change_pass(new_password, logged_user)
 
-        logged_user_new_password = self.sql_manager.login('Tester', new_password)
-        self.assertEqual(logged_user_new_password.get_username(), 'Tester')
+        new_pass = self.sql_manager.login('Tester', new_password)
+        self.assertEqual(new_pass.get_username(), 'Tester')
 
 if __name__ == '__main__':
     unittest.main()
