@@ -28,6 +28,11 @@ class SqlManagerTests(unittest.TestCase):
         logged_user = self.sql_manager.login('Tester', '123')
         self.assertEqual(logged_user.get_username(), 'Tester')
 
+
+    def test_login_with_sql_injection(self):
+        logged_user = self.sql_manager.login("' OR 1 = 1 --", "whatever")
+        self.assertIsNone(logged_user)
+
     def test_login_wrong_password(self):
         logged_user = self.sql_manager.login('Tester', '123567')
         self.assertFalse(logged_user)

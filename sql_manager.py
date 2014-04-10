@@ -40,12 +40,15 @@ class SqlManager():
         self.conn.commit()
 
     def login(self, username, password):
-        select_query = "SELECT id, username, balance, message FROM clients WHERE username = '%s' AND password = '%s' LIMIT 1" % (username, password)
+        select_query = """SELECT id, username, balance, message
+                          FROM clients
+                          WHERE username = ? AND password = ?
+                          LIMIT 1"""
 
-        self.cursor.execute(select_query)
+        self.cursor.execute(select_query, (username, password))
         user = self.cursor.fetchone()
 
         if(user):
             return Client(user[0], user[1], user[2], user[3])
         else:
-            return False
+            return None
