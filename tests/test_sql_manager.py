@@ -81,5 +81,36 @@ class SqlManagerTests(unittest.TestCase):
         result = self.sql_manager.create_login_attempt("Tester", "login")
         self.assertTrue(result)
 
+    def test_is_user_blocked_for_non_existent_user(self):
+        result = self.sql_manager.is_user_blocked("OMGOMGOMG")
+        self.assertFalse(result)
+
+    def test_is_user_blocked_without_any_logins(self):
+        result = self.sql_manager.is_user_blocked("Tester")
+        self.assertFalse(result)
+
+    def test_should_block_user_with_no_login_attempts(self):
+        result = self.sql_manager.should_block_user("Tester")
+        self.assertFalse(result)
+
+    def test_should_block_user_after_6_wrong_attempts(self):
+        wrong_password = Password("Wrong_Password1234@")
+
+        for i in range(6):
+            self.sql_manager.login("Tester", wrong_password)
+
+        result = self.sql_manager.should_block_user("Tester")
+        self.assertTrue(result)
+
+    @unittest.skip
+    def test_is_user_blocked_after_6_attempts(self):
+        wrong_password = Password("Wrong_Password1234@")
+
+        for i in range(6):
+            self.sql_manager.login("Tester", wrong_password)
+
+        result = self.sql_manager.is_user_blocked("Tester")
+        self.assertTrue(result)
+
 if __name__ == '__main__':
     unittest.main()
