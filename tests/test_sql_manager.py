@@ -5,17 +5,18 @@ sys.path.append("..")
 
 from sql_manager import SqlManager
 from password import Password
+import os
 
 
 class SqlManagerTests(unittest.TestCase):
 
     def setUp(self):
-        self.sql_manager = SqlManager("bank_test.db")
-        self.sql_manager.create_clients_table()
+        self.db_file = "bank_test.db"
+        self.sql_manager = SqlManager(self.db_file)
         self.sql_manager.register('Tester', Password('Radorado1234@'))
 
     def tearDown(self):
-        self.sql_manager.cursor.execute('DROP TABLE clients')
+        os.remove(self.db_file)
 
     def test_register(self):
         p = Password('Radorado1234@')
@@ -67,6 +68,18 @@ class SqlManagerTests(unittest.TestCase):
 
         new_pass = self.sql_manager.login('Tester', new_password)
         self.assertEqual(new_pass.get_username(), 'Tester')
+
+    def test_get_id_by_username(self):
+        result = self.sql_manager.get_id_by_username("Tester")
+        self.assertEqual(1, result)
+
+    def test_get_id_by_username_not_found(self):
+        result = self.sql_manager.get_id_by_username("Tester Not Found")
+        self.assertIsNone(result)
+
+    def test_create_login_attempt(self):
+        result = self.sql_manager.create_login_attempt("Tester", "login")
+        self.assertTrue(result)
 
 if __name__ == '__main__':
     unittest.main()
