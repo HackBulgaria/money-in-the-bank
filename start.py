@@ -42,11 +42,15 @@ class BankProgram():
                 username = input("Enter your username: ")
                 password = self.input_pass()
                 logged_user = self.sql_manager.login(username, password)
+                login_status = "fail"
 
                 if logged_user:
+                    login_status = "success"
                     self.logged_menu(logged_user)
                 else:
                     print("Login failed")
+
+                self.sql_manager.create_login_attempt(username, login_status)
 
             elif command == 'help':
                 print("login - for logging in!")
