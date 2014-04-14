@@ -21,7 +21,7 @@ class SqlManager():
                                 attempt_id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 client_id INTEGER,
                                 status TEXT,
-                                timestamp int)'''
+                                login_timestamp INTEGER)'''
 
         self.cursor.execute(create_clients_query)
         self.cursor.execute(login_attempts_query)
@@ -69,7 +69,7 @@ class SqlManager():
 
     def create_login_attempt(self, username, status):
         attempt_query = """INSERT INTO
-                           login_attempts(client_id, status, timestamp)
+                           login_attempts(client_id, status, login_timestamp)
                            VALUES(?, ?, ?)
                         """
 
