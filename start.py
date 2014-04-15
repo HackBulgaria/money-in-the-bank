@@ -1,4 +1,4 @@
-from sql_manager import SqlManager
+from sql_manager import SqlManager, BlockedUserException
 from getpass import getpass
 from password import Password, PasswordValidator, PasswordNotStrongException
 from client import Client
@@ -41,12 +41,15 @@ class BankProgram():
             elif command == 'login':
                 username = input("Enter your username: ")
                 password = self.input_pass()
-                logged_user = self.sql_manager.login(username, password)
 
-                if logged_user:
-                    self.logged_menu(logged_user)
-                else:
-                    print("Login failed")
+                try:
+                    logged_user = self.sql_manager.login(username, password)
+                    if logged_user:
+                        self.logged_menu(logged_user)
+                    else:
+                        print("Login failed")
+                except BlockedUserException as e:
+                    print(str(e))
 
             elif command == 'help':
                 print("login - for logging in!")
