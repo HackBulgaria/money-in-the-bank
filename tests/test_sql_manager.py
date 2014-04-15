@@ -1,9 +1,9 @@
 import sys
 import unittest
-
+from time import time
 sys.path.append("..")
 
-from sql_manager import SqlManager
+from sql_manager import SqlManager, BlockedUserException
 from password import Password
 import os
 
@@ -93,24 +93,60 @@ class SqlManagerTests(unittest.TestCase):
         result = self.sql_manager.should_block_user("Tester")
         self.assertFalse(result)
 
+    def test_should_block_user_with_less_then_block_attempts(self):
+        wrong_password = Password("Wrong_Password1234@")
+
+        for i in range(3):
+            self.sql_manager.login("Tester", wrong_password)
+
+        self.assertFalse(self.sql_manager.should_block_user("Tester"))
+
     def test_should_block_user_after_6_wrong_attempts(self):
         wrong_password = Password("Wrong_Password1234@")
 
-        for i in range(6):
+        for i in range(5):
+            self.sql_manager.login("Tester", wrong_password)
+
+        with self.assertRaises(BlockedUserException):
             self.sql_manager.login("Tester", wrong_password)
 
         result = self.sql_manager.should_block_user("Tester")
         self.assertTrue(result)
 
-    @unittest.skip
+    def test_block_user(self):
+        self.assertFalse(self.sql_manager.is_user_blocked("Tester"))
+        self.sql_manager.block_user("Tester")
+        self.assertTrue(self.sql_manager.is_user_blocked("Tester"))
+
     def test_is_user_blocked_after_6_attempts(self):
         wrong_password = Password("Wrong_Password1234@")
 
-        for i in range(6):
+        for i in range(5):
+            self.sql_manager.login("Tester", wrong_password)
+
+        with self.assertRaises(BlockedUserException):
             self.sql_manager.login("Tester", wrong_password)
 
         result = self.sql_manager.is_user_blocked("Tester")
         self.assertTrue(result)
+
+    def test_is_user_blocked_after_6_attempts_after_6_minutes(self):
+        wrong_password = Password("Wrong_Password1234@")
+
+        for i in range(5):
+            self.sql_manager.login("Tester", wrong_password)
+
+        with self.assertRaises(BlockedUserException):
+            self.sql_manager.login("Tester", wrong_password)
+
+        user_id = self.sql_manager.get_id_by_username("Tester")
+        before_6_minutes = int(time()) - 6 * 60
+        update_clients = """UPDATE clients SET blocked_time = ? WHERE id = ?"""
+        self.sql_manager.cursor.execute(update_clients,
+                                       (before_6_minutes, user_id))
+
+        result = self.sql_manager.is_user_blocked("Tester")
+        self.assertFalse(result)
 
 if __name__ == '__main__':
     unittest.main()

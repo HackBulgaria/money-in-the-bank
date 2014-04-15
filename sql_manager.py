@@ -3,6 +3,10 @@ from client import Client
 from time import time
 
 
+class BlockedUserException(Exception):
+    pass
+
+
 class SqlManager():
     def __init__(self, db_file):
         self.conn = sqlite3.connect(db_file)
@@ -45,6 +49,9 @@ class SqlManager():
         self.conn.commit()
 
     def login(self, username, password_obj):
+        if self.is_user_blocked(username):
+            raise BlockedUserException("User is blocked!")
+
         select_query = """SELECT id, username, balance
                           FROM clients
                           WHERE username = ? AND password = ?
@@ -62,6 +69,10 @@ class SqlManager():
             result = Client(user[0], user[1], user[2])
 
         self.create_login_attempt(username, login_status)
+
+        if self.should_block_user(username):
+            self.block_user(username)
+
         return result
 
     def get_id_by_username(self, username):
@@ -83,9 +94,26 @@ class SqlManager():
         if user_id is None:
             return False
 
-        timestamp = int(time())
+        current_timestamp = int(time())
 
-        self.cursor.execute(attempt_query, (user_id, status, timestamp))
+        self.cursor.execute(attempt_query,
+                           (user_id, status, current_timestamp))
+        self.conn.commit()
+
+        return True
+
+    def block_user(self, username):
+        user_id = self.get_id_by_username(username)
+
+        if user_id is None:
+            return False
+
+        current_timestamp = int(time())
+        block_user_query = """UPDATE clients
+                              SET blocked_time = ?
+                              WHERE id = ?"""
+
+        self.cursor.execute(block_user_query, (current_timestamp, user_id))
         self.conn.commit()
 
         return True
@@ -109,13 +137,20 @@ class SqlManager():
             if row[0] == "fail":
                 count_fails += 1
 
-        if count_fails >= 5:
-            return True
-
-        return False
+        return count_fails >= 5
 
     def is_user_blocked(self, username):
         user_id = self.get_id_by_username(username)
 
         if user_id is None:
             return False
+
+        blocked_query = """SELECT blocked_time FROM clients WHERE id = ?"""
+        result = self.cursor.execute(blocked_query, (user_id,)).fetchone()
+
+        if result is None or result[0] is None:
+            return False
+        blocked_time = result[0]
+        now = int(time())
+
+        return blocked_time + 300 >= now
