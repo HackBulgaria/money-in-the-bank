@@ -1,6 +1,7 @@
 import sys
 import unittest
 from time import time
+from sqlite3 import IntegrityError
 sys.path.append("..")
 
 from sql_manager import SqlManager, BlockedUserException
@@ -30,6 +31,13 @@ class SqlManagerTests(unittest.TestCase):
         users_count = self.sql_manager.cursor.fetchone()
 
         self.assertEqual(users_count[0], 1)
+
+    def test_register_unique_username(self):
+        p = Password('Radorado1234@')
+        self.sql_manager.register('Dinko', p)
+
+        with self.assertRaises(IntegrityError):
+            self.sql_manager.register("Dinko", p)
 
     def test_register_password_should_not_be_plain_text(self):
         plain = "asd"

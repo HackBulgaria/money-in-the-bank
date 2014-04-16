@@ -16,7 +16,7 @@ class SqlManager():
     def create_clients_table(self):
         create_clients_query = '''create table if not exists
             clients(id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT,
+                    username TEXT UNIQUE,
                     password TEXT,
                     balance REAL DEFAULT 0,
                     blocked_time INTEGER)'''

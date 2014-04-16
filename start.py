@@ -2,6 +2,7 @@ from sql_manager import SqlManager, BlockedUserException
 from getpass import getpass
 from password import Password, PasswordValidator, PasswordNotStrongException
 from client import Client
+from sqlite3 import IntegrityError
 
 
 class BankProgram():
@@ -34,9 +35,12 @@ class BankProgram():
                         break
                     except PasswordNotStrongException as e:
                         print(e)
-                self.sql_manager.register(username, password)
 
-                print("Registration Successfull")
+                try:
+                    self.sql_manager.register(username, password)
+                    print("Registration Successfull")
+                except IntegrityError as e:
+                    print("Username already registered. Try another!")
 
             elif command == 'login':
                 username = input("Enter your username: ")
