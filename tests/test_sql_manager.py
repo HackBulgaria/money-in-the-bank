@@ -14,14 +14,16 @@ class SqlManagerTests(unittest.TestCase):
     def setUp(self):
         self.db_file = "bank_test.db"
         self.sql_manager = SqlManager(self.db_file)
-        self.sql_manager.register('Tester', Password('Radorado1234@'))
+        self.sql_manager.register('Tester',
+                                  "tester@tester.com",
+                                  Password('Radorado1234@'))
 
     def tearDown(self):
         os.remove(self.db_file)
 
     def test_register(self):
         p = Password('Radorado1234@')
-        self.sql_manager.register('Dinko', p)
+        self.sql_manager.register('Dinko', "dinko@dinko.com", p)
         count_sql = """SELECT Count(*)
                        FROM clients
                        WHERE
@@ -34,15 +36,15 @@ class SqlManagerTests(unittest.TestCase):
 
     def test_register_unique_username(self):
         p = Password('Radorado1234@')
-        self.sql_manager.register('Dinko', p)
+        self.sql_manager.register('Dinko', "dinko@dinko.com", p)
 
         with self.assertRaises(IntegrityError):
-            self.sql_manager.register("Dinko", p)
+            self.sql_manager.register("Dinko", "dinko@dinko.com", p)
 
     def test_register_password_should_not_be_plain_text(self):
         plain = "asd"
         p = Password(plain)
-        self.sql_manager.register("Test", p)
+        self.sql_manager.register("Test", "dinko@dinko.com", p)
 
         password_sql = """SELECT password
                           FROM clients

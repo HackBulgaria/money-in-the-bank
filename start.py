@@ -24,11 +24,15 @@ class BankProgram():
 
             if command == 'register':
                 username = input("Enter your username: ")
+                email = input("Enter your email: ")
 
                 while True:
                     password = self.input_pass()
                     validator = PasswordValidator(password,
-                                                  Client(1, username, 0))
+                                                  Client(1,
+                                                         username,
+                                                         email,
+                                                         0))
 
                     try:
                         validator.validate_with_exception()
@@ -37,7 +41,7 @@ class BankProgram():
                         print(e)
 
                 try:
-                    self.sql_manager.register(username, password)
+                    self.sql_manager.register(username, email, password)
                     print("Registration Successfull")
                 except IntegrityError as e:
                     print("Username already registered. Try another!")

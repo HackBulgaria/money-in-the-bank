@@ -1,8 +1,9 @@
 class Client():
-    def __init__(self, id, username, balance):
-        self.__username = username
-        self.__balance = balance
+    def __init__(self, id, username, email, balance):
         self.__id = id
+        self.__username = username
+        self.__email = email
+        self.__balance = balance
 
     def get_username(self):
         return self.__username
@@ -12,3 +13,6 @@ class Client():
 
     def get_id(self):
         return self.__id
+
+    def get_email(self):
+        return self.__email

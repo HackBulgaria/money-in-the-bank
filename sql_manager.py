@@ -17,6 +17,7 @@ class SqlManager():
         create_clients_query = '''create table if not exists
             clients(id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT UNIQUE,
+                    email TEXT UNIQUE,
                     password TEXT,
                     balance REAL DEFAULT 0,
                     blocked_time INTEGER)'''
@@ -41,18 +42,18 @@ class SqlManager():
         self.cursor.execute(update_sql, (new_pass, logged_user.get_id()))
         self.conn.commit()
 
-    def register(self, username, password_obj):
-        insert_sql = """INSERT INTO clients (username, password)
-                        VALUES (?, ?)"""
+    def register(self, username, email, password_obj):
+        insert_sql = """INSERT INTO clients (username, email, password)
+                        VALUES (?, ?, ?)"""
         password = password_obj.to_sha1()
-        self.cursor.execute(insert_sql, (username, password))
+        self.cursor.execute(insert_sql, (username, email, password))
         self.conn.commit()
 
     def login(self, username, password_obj):
         if self.is_user_blocked(username):
             raise BlockedUserException("User is blocked!")
 
-        select_query = """SELECT id, username, balance
+        select_query = """SELECT id, username, email, balance
                           FROM clients
                           WHERE username = ? AND password = ?
                           LIMIT 1"""
@@ -66,7 +67,7 @@ class SqlManager():
 
         if user:
             login_status = "success"
-            result = Client(user[0], user[1], user[2])
+            result = Client(user[0], user[1], user[2], user[3])
 
         self.create_login_attempt(username, login_status)
 

@@ -8,7 +8,7 @@ from client import Client
 class ClientTests(unittest.TestCase):
 
     def setUp(self):
-        self.test_client = Client(1, "Ivo", 200000.00)
+        self.test_client = Client(1, "Ivo", "ivo@ivo.com", 200000.00)
 
     def test_client_id(self):
         self.assertEqual(self.test_client.get_id(), 1)

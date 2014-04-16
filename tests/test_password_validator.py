@@ -10,7 +10,7 @@ from client import Client
 class TestPasswordValidator(unittest.TestCase):
     """docstring for TestPasswordValidator"""
     def setUp(self):
-        self.user = Client(1, "Rado", 0)
+        self.user = Client(1, "Rado", "rado@rado.com", 0)
         self.short_password = Password("short")
         self.weak_password = Password("weak_password")
 
@@ -34,14 +34,14 @@ class TestPasswordValidator(unittest.TestCase):
         self.assertFalse(validator.validate())
 
     def test_password_validator_validate_name_in_pass(self):
-        user = Client(1, "lqlq", 0)
+        user = Client(1, "lqlq", "lqlq@lqlq.com", 0)
         p = Password("lqlqOMG11!!")
         validator = PasswordValidator(p, user)
 
         self.assertFalse(validator.validate())
 
     def test_password_that_is_valid(self):
-        user = Client(1, "lqlq", 0)
+        user = Client(1, "lqlq", "lqlq@lqlq.com", 0)
         p = Password("radoradoOMG11!!")
         validator = PasswordValidator(p, user)
 
